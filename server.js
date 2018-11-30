@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const morgan  = require('morgan')
 const gameController = require('./gamecontroller.js')
 
-const port = 3000
+const port = process.env.port || 3000
 
 var app = express()
 
