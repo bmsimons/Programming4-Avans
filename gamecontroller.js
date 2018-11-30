@@ -1,5 +1,6 @@
 const inputValidation = require('./inputvalidation.js')
 const Game = require('./game.js')
+const ApiError = require('./error.js')
 
 let games = [new Game('Battlefield 5', 'EA', 2018, 'FPS'), new Game('Rocket League', 'Psyonix', 2017, 'Sports')]
 
@@ -7,11 +8,10 @@ var idCounter = 1;
 
 module.exports = {
 	getAll(req, res) {
-		console.log(typeof(games[0]))
 		res.status(200).json(games).end()
 	},
 
-	getById(req, res) {
+	getById(req, res, next) {
 		var result = null
 
 		games.forEach((item) => {
@@ -23,9 +23,7 @@ module.exports = {
 		if (result) {
 			res.status(200).json(result).end()
 		} else {
-			res.status(404).json({
-				message: 'No game with your specified ID has been found in the system.'
-			}).end()
+			next(new ApiError('No game with your specified ID has been found in the system.', 404))
 		}
 	},
 
