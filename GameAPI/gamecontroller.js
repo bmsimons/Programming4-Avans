@@ -1,3 +1,5 @@
+const inputValidation = require('./inputvalidation.js')
+
 let games = [{
 	id: 0,
 	name: 'Battlefield 5',
@@ -32,19 +34,25 @@ module.exports = {
 	},
 
 	addNewGame(req, res) {
-		games.push({
-			id: idCounter,
-			name: req.body.name,
-			producer: req.body.producer,
-			year: req.body.year,
-			genre: req.body.genre
-		})
+		if (inputValidation.addNewGameValidation(req.body)) {
+			games.push({
+				id: idCounter,
+				name: req.body.name,
+				producer: req.body.producer,
+				year: req.body.year,
+				genre: req.body.genre
+			})
 
-		idCounter++
+			idCounter++
 
-		res.status(200).json({
-			message: 'Game succesfully added.'
-		})
+			res.status(200).json({
+				message: 'Game succesfully added.'
+			})
+		} else {
+			res.status(400).json({
+				message: 'Invalid request body.'
+			})
+		}
 	},
 
 	deleteGame(req, res) {
@@ -61,15 +69,21 @@ module.exports = {
 	},
 
 	updateGame(req, res) {
-		games.forEach((item, index, object) => {
-			if (item.id == req.body.id) {
-				games[index] = req.body
-				return
-			}
-		})
+		if (inputValidation.updateGameValidation(req.body)) {
+			games.forEach((item, index, object) => {
+				if (item.id == req.body.id) {
+					games[index] = req.body
+					return
+				}
+			})
 
-		res.status(200).json({
-			message: 'Game succesfully updated.'
-		})
+			res.status(200).json({
+				message: 'Game succesfully updated.'
+			})
+		} else {
+			res.status(400).json({
+				message: 'Invalid request body.'
+			})
+		}
 	}
 }
