@@ -45,5 +45,31 @@ module.exports = {
 		res.status(200).json({
 			message: 'Game succesfully added.'
 		})
+	},
+
+	deleteGame(req, res) {
+		games.forEach((item, index, object) => {
+			if (item.id == req.params.gameId) {
+				object.splice(index, 1)
+				return
+			}
+		})
+
+		res.status(200).json({
+			message: 'Game succesfully removed.'
+		})
+	},
+
+	updateGame(req, res) {
+		games.forEach((item, index, object) => {
+			if (item.id == req.body.id) {
+				games[index] = req.body
+				return
+			}
+		})
+
+		res.status(200).json({
+			message: 'Game succesfully updated.'
+		})
 	}
 }
