@@ -1,17 +1,13 @@
 const inputValidation = require('./inputvalidation.js')
+const Game = require('./game.js')
 
-let games = [{
-	id: 0,
-	name: 'Battlefield 5',
-	producer: 'EA',
-	year: 2018,
-	genre: 'FPS'
-}]
+let games = [new Game('Battlefield 5', 'EA', 2018, 'FPS'), new Game('Rocket League', 'Psyonix', 2017, 'Sports')]
 
 var idCounter = 1;
 
 module.exports = {
 	getAll(req, res) {
+		console.log(typeof(games[0]))
 		res.status(200).json(games).end()
 	},
 
@@ -35,13 +31,7 @@ module.exports = {
 
 	addNewGame(req, res) {
 		if (inputValidation.addNewGameValidation(req.body)) {
-			games.push({
-				id: idCounter,
-				name: req.body.name,
-				producer: req.body.producer,
-				year: req.body.year,
-				genre: req.body.genre
-			})
+			games.push(new Game(req.body.name, req.body.producer, req.body.year, req.body.genre))
 
 			idCounter++
 
