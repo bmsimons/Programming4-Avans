@@ -11,7 +11,7 @@ describe('Games API GET', () => {
 			.get('/games')
 			.end((err, res) => {
 				res.should.have.status(200)
-				res.body.should.be.an('array')
+				res.body.should.be.an('object')
 				done()
 			})
 	})
