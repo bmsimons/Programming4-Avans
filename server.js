@@ -25,4 +25,4 @@ app.use('*', (err, req, res, next) => {
 	res.status(err.code).json({error: err}).end()
 })
 
-app.listen(port, () => console.log(`Game API listening on port ${port}!`))
+module.exports = app.listen(port, () => console.log(`Game API listening on port ${port}!`))
