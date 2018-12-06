@@ -1,55 +1,79 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../server')
+const bodyParser = require('body-parser')
+const Game = require('../game')
 
 chai.should()
 chai.use(chaiHttp)
 
 describe('Games API GET', () => {
+	var firstObject = {}
+
 	it('/games should return an object array', (done) => {
 		chai.request(server)
 			.get('/games')
 			.end((err, res) => {
-				res.should.have.status(200)
-				res.body.should.be.an('array')
-				done()
+				if (!err) {
+					res.should.have.status(200)
+					res.body.should.be.an('array')
+					if (res.body.length > 0) {
+						firstObject = res.body[0]
+						done()
+					}
+				}
 			})
 	})
 
-	// it('/games/0 should return the first dummy object', (done) => {
-	// 	chai.request(server)
-	// 		.get('/games/0')
-	// 		.end((err, res) => {
-	// 			res.should.have.status(200)
-	// 			res.body.should.be.an('object')
-	// 			res.body.should.have.property('id').equals(0)
-	// 			res.body.should.have.property('name').equals('Battlefield 5')
-	// 			res.body.should.have.property('producer').equals('EA')
-	// 			res.body.should.have.property('year').equals(2018)
-	// 			res.body.should.have.property('genre').equals('FPS')
-
-	// 			done()
-	// 		})
-	// })
+	it(`/games/${firstObject.id} should return ONLY the first object`, (done) => {
+		chai.request(server)
+			.get(`/games/${firstObject.id}`)
+			.end((err, res) => {
+				if (!err) {
+					res.should.have.status(200)
+					res.body.should.be.an('object')
+					if (res.body.id == firstObject.id && res.body.name == firstObject.name && res.body.producer == firstObject.producer && res.body.year == firstObject.year && res.body.genre == firstObject.genre) {
+						done()
+					}
+				}
+			})
+	})
 })
 
-// describe('Games API DELETE', () => {
-// 	it('Deleting /games/0 should reduce the total of games to one', (done) => {
-// 		chai.request(server)
-// 			.delete('/games/0')
-// 			.end((err, res) => {
-// 				res.should.have.status(200)
-// 			})
+var gameToDelete = {}
 
-// 		chai.request(server)
-// 			.get('/games')
-// 			.end((err, res) => {
-// 				res.should.have.status(200)
-// 				res.body.should.be.an('array')
+describe('Games API POST', () => {
+	var newGame = new Game(0, 'Rocket League', 'Psyonix', 2015, 'UNKNOWN')
 
-// 				if (res.body.length == 0) {
-// 					done()
-// 				}
-// 			})
-// 	})
-// })
+	it('Creating new game should return the newly created game as an object', (done) => {
+		chai.request(server)
+			.post('/games')
+			.send(newGame)
+			.end((err, res) => {
+				if (!err) {
+					res.should.have.status(200)
+					res.body.should.be.an('object')
+					if (res.body.name == newGame.name && res.body.producer == newGame.producer && res.body.year == newGame.year && res.body.genre == newGame.genre) {
+						gameToDelete = res.body
+						done()
+					}
+				}
+			})
+	})
+})
+
+describe('Games API DELETE', () => {
+	it('Deleting newly created game should return the exact same object', (done) => {
+		chai.request(server)
+			.delete('/games/'+gameToDelete.id)
+			.end((err, res) => {
+				if (!err) {
+					res.should.have.status(200)
+					res.body.should.be.an('object')
+					if (res.body.id == gameToDelete.id && res.body.name == gameToDelete.name && res.body.producer == gameToDelete.producer && res.body.year == gameToDelete.year && res.body.genre == gameToDelete.genre) {
+						done()
+					}
+				}
+			})
+	})
+})

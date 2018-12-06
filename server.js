@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const morgan  = require('morgan')
 const gameController = require('./gamecontroller.js')
+const authController = require('./authcontroller.js')
 const ApiError = require('./error.js')
 
 const port = process.env.PORT || 3000
@@ -17,11 +18,15 @@ app.post('/games', gameController.addNewGame)
 app.delete('/games/:gameId', gameController.deleteGame)
 app.put('/games', gameController.updateGame)
 
+app.post('/register', authController.registerUser)
+app.post('/login', authController.loginUser)
+
 app.use('*', (req, res, next) => {
 	next(new ApiError('Non-existing endpoint', 404))
 })
 
 app.use('*', (err, req, res, next) => {
+	console.dir(err)
 	res.status(err.code).json({error: err}).end()
 })
 

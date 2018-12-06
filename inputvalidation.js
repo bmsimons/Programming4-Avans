@@ -13,5 +13,21 @@ module.exports = {
 		} else {
 			return false
 		}
+	},
+
+	registerValidation(body) {
+		if (body.firstname !== null && body.lastname !== null && body.email !== null && body.password !== null) {
+			return true
+		} else {
+			return false
+		}
+	},
+
+	loginValidation(body) {
+		if (body.email !== null && body.password !== null) {
+			return true
+		} else {
+			return false
+		}
 	}
 }
