@@ -62,7 +62,7 @@ describe('Games API auth', () => {
 	var gameToDelete = {}
 
 	describe('Games API POST', () => {
-		var newGame = new Game(0, 'Rocket League', 'Psyonix', 2015, 'UNKNOWN')
+		var newGame = new Game(0, 1, 'Rocket League', 'Psyonix', 2015, 'UNKNOWN')
 
 		it('Creating new game should return the newly created game as an object', (done) => {
 			chai.request(server)
@@ -73,6 +73,7 @@ describe('Games API auth', () => {
 					if (!err) {
 						res.should.have.status(200)
 						res.body.should.be.an('object')
+						console.log(res.body)
 						if (res.body.name == newGame.name && res.body.producer == newGame.producer && res.body.year == newGame.year && res.body.genre == newGame.genre) {
 							gameToDelete = res.body
 							done()

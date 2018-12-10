@@ -34,7 +34,8 @@ module.exports = {
 							const payload = {
 								exp: moment().add(10, 'days').unix(),
 								iat: moment().unix(),
-								sub: req.body.username
+								sub: req.body.username,
+								uid: e.ID
 							}
 
 							res.status(200).json({token: jwt.sign(payload, 'HMAC_SHA_256_SECRET_KEY_GOES_HERE')})

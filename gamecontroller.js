@@ -17,7 +17,9 @@ module.exports = {
 						} else {
 							let games = []
 							rows.forEach((e) => {
-								games.push(new Game(e.ID, e.title, e.producer, e.year, e.Type))
+								if (decoded.uid == e.createdby) {
+									games.push(new Game(e.ID, decoded.uid, e.title, e.producer, e.year, e.Type))
+								}
 							})
 							res.status(200).json(games).end()
 						}
@@ -36,13 +38,13 @@ module.exports = {
 				if (err) {
 					next(new ApiError('Invalid token.', 401))
 				} else {
-					pool.query(`SELECT * FROM games WHERE ID = ${parseInt(req.params.gameId)}`, function (err, rows, fields) {
+					pool.query(`SELECT * FROM games WHERE ID = ${parseInt(req.params.gameId)} AND createdby = ${parseInt(decoded.uid)};`, function (err, rows, fields) {
 						if (err) {
 							next(new ApiError("Database error", 500))
 						} else {
 							if (rows.length !== 0) {
 								rows.forEach((e) => {
-									res.status(200).json(new Game(e.ID, e.title, e.producer, e.year, e.Type))
+									res.status(200).json(new Game(e.ID, decoded.uid, e.title, e.producer, e.year, e.Type))
 									return
 								})
 							} else {
@@ -64,11 +66,11 @@ module.exports = {
 					next(new ApiError('Invalid token.', 401))
 				} else {
 					if (inputValidation.addNewGameValidation(req.body)) {
-						pool.query('INSERT INTO games (title, producer, year, Type) VALUES (?, ?, ?, ?);', [req.body.name, req.body.producer, parseInt(req.body.year), req.body.genre], function(err, rows, fields) {
+						pool.query('INSERT INTO games (title, producer, year, Type, createdby) VALUES (?, ?, ?, ?, ?);', [req.body.name, req.body.producer, parseInt(req.body.year), req.body.genre, decoded.uid], function(err, rows, fields) {
 							if (err) {
 								next(new ApiError("Database error.", 500))
 							} else {
-								res.status(200).json(new Game(rows.insertId, req.body.name, req.body.producer, req.body.year, req.body.genre))	
+								res.status(200).json(new Game(rows.insertId, decoded.uid, req.body.name, req.body.producer, req.body.year, req.body.genre))	
 							}
 						})
 					} else {
@@ -97,7 +99,7 @@ module.exports = {
 										if (err) {
 											next(new ApiError(err, 500))
 										} else {
-											res.status(200).json(new Game(e.ID, e.title, e.producer, e.year, e.Type))
+											res.status(200).json(new Game(e.ID, e.createdby, e.title, e.producer, e.year, e.Type))
 										}
 									})
 									return
@@ -121,12 +123,12 @@ module.exports = {
 					next(new ApiError('Invalid token.', 401))
 				} else {
 					if (inputValidation.updateGameValidation(req.body)) {
-						pool.query('UPDATE games SET title = ?, producer = ?, year = ?, Type = ? WHERE ID = ?;', [req.body.name, req.body.producer, parseInt(req.body.year), req.body.genre, req.body.id], function(err, rows, fields) {
+						pool.query('UPDATE games SET title = ?, producer = ?, year = ?, Type = ? WHERE ID = ? AND createdby = ?;', [req.body.name, req.body.producer, parseInt(req.body.year), req.body.genre, req.body.id, decoded.uid], function(err, rows, fields) {
 							console.log(rows)
 							if (err) {
 								next(new ApiError("Database error.", 500))
 							} else {
-								res.status(200).json(new Game(req.body.id, req.body.name, req.body.producer, req.body.year, req.body.genre))	
+								res.status(200).json(new Game(req.body.id, decoded.uid, req.body.name, req.body.producer, req.body.year, req.body.genre))	
 							}
 						})
 					} else {
